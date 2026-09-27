@@ -1,0 +1,195 @@
+/* Typography · Dashboard — Nexus
+ * Espelha 1:1 a collection "Typography · Dashboard" do Figma
+ * (page DS - Foundations, board "Dashboard Typography Board" 47:2).
+ *
+ * Superfície: dashboard do psicólogo. Web responsivo. Inter.
+ * O app do aluno e dos pais NÃO usa nada daqui — ver typography-app.css.
+ *
+ * REGRA DE NOME: caminho do Figma com "/" virando "-". Nada é renomeado,
+ * nada é inventado. `size/h1` -> `--dashboard-size-h1`.
+ * O prefixo `dashboard-` existe porque `size/body-md` também existe na
+ * collection do app: namespace de CSS var é global, então quando o mesmo
+ * caminho aparece em duas collections, a superfície entra na frente.
+ * `Primitives` e `Semantic` seguem sem prefixo — não colidem com ninguém.
+ *
+ * ESCALA ÚNICA (16/08/2026). Antes eram dois modes, `Mobile` base e
+ * `Desktop` em @media 1024px, com h1 chegando a 52px. O dashboard mostra
+ * muita informação por tela e precisa de densidade, então o teto caiu para
+ * 32px e a rampa de heading virou 14 / 16 / 18 / 24 / 32. Com esse teto a
+ * escala já cabe em 375px, e não sobra degrau para montar um Mobile menor
+ * sem inventar valor fora da rampa — por isso o mode `Mobile` sumiu e não
+ * há mais media query aqui.
+ *
+ * UNIDADE: rem, não px. 1rem = 16px no root default. O usuário que aumenta
+ * o corpo de texto no browser passa a ser respeitado — com px não era.
+ * Nenhum valor daqui deve voltar a ser px.
+ *
+ * PISO EM 12px, E ELE É CAPTION (16/08/2026). Três estilos foram apagados
+ * no mesmo movimento, todos pela mesma razão: eram 12/16 com outro nome.
+ *   `caption/sm`        existia em 10, subiu para 11, depois para 12 — e
+ *                       nesse ponto era `caption/md` repetido.
+ *   `body/sm`           desceu de 14 para 13 e depois para 12/16, e virou
+ *                       `caption/md` com 0,25% a menos de tracking.
+ *   `body/sm-semibold`  mesma história contra `caption/md-semibold`.
+ *
+ * A regra que sobra: 12/16 no dashboard é caption, e caption é uma família
+ * só, separada por peso — md / md-semibold / md-bold. Texto denso de tabela
+ * usa `caption/md`; cabeçalho de tabela usa `caption/md-semibold`. Não criar
+ * um `body/sm` de novo: `body` começa em 14 (`body/md`) e é isso.
+ *
+ * As variables `size/caption-sm`, `line-height/caption-sm`, `size/body-sm` e
+ * `line-height/body-sm` saíram da collection junto.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * font-family / font-weight
+   *
+   * São variables no Figma (`font-family/base`, `font-weight/*`,
+   * bound em fontFamily/fontStyle nos 11 estilos). O valor no Figma
+   * é o nome do estilo ("Semi Bold"); aqui vira o peso numérico do CSS.
+   * Esse mapa é a única tradução do pipeline.
+   * --------------------------------------------------------------- */
+  --dashboard-font-family-base: "Inter", sans-serif;
+
+  --dashboard-font-weight-light: 300;    /* Figma: Light — sem estilo usando desde 16/08/2026 (h1 virou Medium). Fica porque `font-weight/light` ainda existe na collection. */
+  --dashboard-font-weight-regular: 400;  /* Figma: Regular */
+  --dashboard-font-weight-medium: 500;   /* Figma: Medium */
+  --dashboard-font-weight-semibold: 600; /* Figma: Semi Bold */
+  --dashboard-font-weight-bold: 700;     /* Figma: Bold */
+
+  /* ---------------------------------------------------------------
+   * size
+   * O px em comentário é a referência de 1rem = 16px, não um fallback.
+   * --------------------------------------------------------------- */
+  --dashboard-size-h1: 2rem;             /* 32px */
+  --dashboard-size-h2: 1.5rem;           /* 24px */
+  --dashboard-size-h3: 1.125rem;         /* 18px */
+  --dashboard-size-h4: 1rem;             /* 16px */
+  --dashboard-size-h5: 0.875rem;         /* 14px */
+  --dashboard-size-body-lg: 1rem;        /* 16px */
+  --dashboard-size-body-md: 0.875rem;    /* 14px — corpo de texto padrão */
+  --dashboard-size-caption-md: 0.75rem;  /* 12px — piso da escala */
+
+  /* ---------------------------------------------------------------
+   * line-height
+   * Valor absoluto, não múltiplo — o Figma guarda px e o ritmo
+   * vertical do dashboard é grade de 4.
+   * --------------------------------------------------------------- */
+  --dashboard-line-height-h1: 2.5rem;        /* 40px */
+  --dashboard-line-height-h2: 2rem;          /* 32px */
+  --dashboard-line-height-h3: 1.75rem;       /* 28px */
+  --dashboard-line-height-h4: 1.5rem;        /* 24px */
+  --dashboard-line-height-h5: 1.25rem;       /* 20px */
+  --dashboard-line-height-body-lg: 1.5rem;   /* 24px */
+  --dashboard-line-height-body-md: 1.25rem;  /* 20px */
+  --dashboard-line-height-caption-md: 1rem;  /* 16px */
+}
+
+/* -----------------------------------------------------------------
+ * Estilos compostos
+ *
+ * No Figma são text styles (`dashboard/heading/1`, …). Aqui cada um é
+ * uma classe com o nome do caminho: `dashboard/heading/1` -> `.dashboard-heading-1`.
+ *
+ * Tracking: PERCENT no Figma -> `em` aqui (−1,5% = -0.015em).
+ * CSS não aceita `%` em letter-spacing.
+ * Os valores afrouxaram junto com a escala: tracking negativo é correção
+ * óptica de tamanho grande, e o maior tamanho agora é 32px, não 52px.
+ * Abaixo de 16px o tracking passa a ser positivo — texto pequeno precisa
+ * de ar, não de aperto.
+ * ----------------------------------------------------------------- */
+
+.dashboard-heading-1,
+.dashboard-heading-2,
+.dashboard-heading-3,
+.dashboard-heading-4,
+.dashboard-heading-5,
+.dashboard-body-lg,
+.dashboard-body-md,
+.dashboard-body-md-semibold,
+.dashboard-caption-md,
+.dashboard-caption-md-semibold,
+.dashboard-caption-md-bold {
+  font-family: var(--dashboard-font-family-base);
+}
+
+/* Medium, não Light. Light 300 aguentava os 52px do h1 antigo; em 32px
+ * some. Peso sobe quando tamanho desce — é a mesma correção óptica do
+ * tracking, no outro eixo. */
+.dashboard-heading-1 {
+  font-weight: var(--dashboard-font-weight-medium);
+  font-size: var(--dashboard-size-h1);
+  line-height: var(--dashboard-line-height-h1);
+  letter-spacing: -0.015em;
+}
+
+.dashboard-heading-2 {
+  font-weight: var(--dashboard-font-weight-medium);
+  font-size: var(--dashboard-size-h2);
+  line-height: var(--dashboard-line-height-h2);
+  letter-spacing: -0.01em;
+}
+
+.dashboard-heading-3 {
+  font-weight: var(--dashboard-font-weight-semibold);
+  font-size: var(--dashboard-size-h3);
+  line-height: var(--dashboard-line-height-h3);
+  letter-spacing: -0.005em;
+}
+
+.dashboard-heading-4 {
+  font-weight: var(--dashboard-font-weight-semibold);
+  font-size: var(--dashboard-size-h4);
+  line-height: var(--dashboard-line-height-h4);
+  letter-spacing: -0.0025em;
+}
+
+.dashboard-heading-5 {
+  font-weight: var(--dashboard-font-weight-semibold);
+  font-size: var(--dashboard-size-h5);
+  line-height: var(--dashboard-line-height-h5);
+  letter-spacing: 0;
+}
+
+.dashboard-body-lg {
+  font-weight: var(--dashboard-font-weight-regular);
+  font-size: var(--dashboard-size-body-lg);
+  line-height: var(--dashboard-line-height-body-lg);
+  letter-spacing: 0;
+}
+
+.dashboard-body-md {
+  font-weight: var(--dashboard-font-weight-regular);
+  font-size: var(--dashboard-size-body-md);
+  line-height: var(--dashboard-line-height-body-md);
+  letter-spacing: 0;
+}
+
+.dashboard-body-md-semibold {
+  font-weight: var(--dashboard-font-weight-semibold);
+  font-size: var(--dashboard-size-body-md);
+  line-height: var(--dashboard-line-height-body-md);
+  letter-spacing: 0;
+}
+
+.dashboard-caption-md {
+  font-weight: var(--dashboard-font-weight-regular);
+  font-size: var(--dashboard-size-caption-md);
+  line-height: var(--dashboard-line-height-caption-md);
+  letter-spacing: 0.005em;
+}
+
+.dashboard-caption-md-semibold {
+  font-weight: var(--dashboard-font-weight-semibold);
+  font-size: var(--dashboard-size-caption-md);
+  line-height: var(--dashboard-line-height-caption-md);
+  letter-spacing: 0.005em;
+}
+
+.dashboard-caption-md-bold {
+  font-weight: var(--dashboard-font-weight-bold);
+  font-size: var(--dashboard-size-caption-md);
+  line-height: var(--dashboard-line-height-caption-md);
+  letter-spacing: 0.005em;
+}

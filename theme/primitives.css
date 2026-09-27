@@ -1,0 +1,134 @@
+/* Primitives — Nexus
+ * Gerado a partir das variáveis do Figma (collection Primitives, mode Default).
+ * Camada base: valores crus. Não usar direto em componentes —
+ * consumir via tokens semânticos.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Color / Brand
+   * --------------------------------------------------------------- */
+  --brand-10: #f9fcfd;
+  --brand-50: #e3eff1;
+  --brand-100: #d3e8ea;
+  --brand-200: #a7ccd2;
+  --brand-300: #7bb1b9;
+  --brand-400: #4d96a0;
+  --brand-500: #007b88;
+  --brand-600: #006e7a;
+  --brand-700: #01616c;
+  --brand-800: #01555e;
+  --brand-900: #004950;
+  --brand-1000: #003239;
+
+  /* ---------------------------------------------------------------
+   * Color / Neutral
+   * --------------------------------------------------------------- */
+  --neutral-0: #ffffff;
+  --neutral-10: #fcfcfa;
+  --neutral-50: #f5f3ef;
+  --neutral-100: #e2e4e1;
+  --neutral-200: #d1d5d4;
+  --neutral-300: #b4b8b7;
+  --neutral-400: #999c9c;
+  --neutral-500: #7e8181;
+  --neutral-600: #646767;
+  --neutral-700: #4b4f4e;
+  --neutral-800: #343736;
+  --neutral-900: #1e2120;
+  --neutral-1000: #0a0d0c;
+
+  /* ---------------------------------------------------------------
+   * Color / Green
+   * --------------------------------------------------------------- */
+  --green-10: #f9fdfa;
+  --green-50: #d6ffdd;
+  --green-100: #c1f1ca;
+  --green-200: #a0d9ab;
+  --green-300: #7dc08b;
+  --green-400: #5ca96e;
+  --green-500: #389252;
+  --green-600: #297840;
+  --green-700: #1b6031;
+  --green-800: #0d4a22;
+  --green-900: #023414;
+  --green-1000: #001f06;
+
+  /* ---------------------------------------------------------------
+   * Color / Orange
+   * --------------------------------------------------------------- */
+  --orange-10: #fefbf7;
+  --orange-50: #ffe9c2;
+  --orange-100: #ffd6aa;
+  --orange-200: #faba85;
+  --orange-300: #e49b5d;
+  --orange-400: #d07f32;
+  --orange-500: #bb6300;
+  --orange-600: #9b4f00;
+  --orange-700: #7e3d00;
+  --orange-800: #632c00;
+  --orange-900: #481b00;
+  --orange-1000: #2d0b00;
+
+  /* ---------------------------------------------------------------
+   * Color / Red
+   * --------------------------------------------------------------- */
+  --red-10: #fffaf9;
+  --red-50: #ffe0d6;
+  --red-100: #ffcdc2;
+  --red-200: #ffaea2;
+  --red-300: #f38e81;
+  --red-400: #df6f62;
+  --red-500: #cb4f44;
+  --red-600: #a83d34;
+  --red-700: #892e26;
+  --red-800: #6c1e19;
+  --red-900: #4f100c;
+  --red-1000: #320302;
+
+  /* ---------------------------------------------------------------
+   * Number / Radius
+   * --------------------------------------------------------------- */
+  --radius-0: 0px;
+  --radius-2: 2px;
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-24: 24px;
+  --radius-full: 9999px;
+
+  /* ---------------------------------------------------------------
+   * Number / Spacing
+   * --------------------------------------------------------------- */
+  --spacing-2: 2px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-10: 10px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+  --spacing-128: 128px;
+
+  /* ---------------------------------------------------------------
+   * Number / Breakpoint
+   *
+   * Único breakpoint do sistema. Até 16/08/2026 ele era o corte da
+   * tipografia do dashboard — acima de 1024 valia o mode Desktop,
+   * abaixo o Mobile. A escala virou única e a media query saiu, então
+   * hoje NENHUM arquivo deste diretório consome este token.
+   *
+   * Fica porque `breakpoint/lg` continua na collection Primitives e o
+   * layout do dashboard ainda vai precisar dele. Se voltar a ser usado
+   * em media query, lembrar: CSS não aceita custom property ali, então
+   * o 1024 vai aparecer literal e os dois precisam andar juntos.
+   * --------------------------------------------------------------- */
+  --breakpoint-lg: 1024px;
+}

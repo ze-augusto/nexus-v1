@@ -1,0 +1,24 @@
+/* Illustration — Nexus
+ * Espelha 1:1 a collection "Illustration" do Figma (mode Default).
+ *
+ * NÃO faz parte do contrato de interface. É a paleta das ilustrações de
+ * clima do check-in (`Illustration / Weather`, 172:96) e de mais nada:
+ * não usar cor de UI aqui, não usar estas cores em UI.
+ *
+ * As quatro nuvens são uma RAMPA DE SEVERIDADE — light → overcast →
+ * rain → storm, escurecendo conforme o tempo piora. A mais clara é
+ * brand/200: o céu mais leve é literalmente a marca. Mexer numa sem
+ * mexer nas outras quebra a progressão.
+ *
+ * O amarelo do sol é o mesmo do raio da tempestade de propósito: é a
+ * única luz que sobra no céu fechado.
+ */
+
+:root {
+  --weather-sun: #e9c56d;
+
+  --weather-cloud-light: #a7ccd2; /* = --brand-200 */
+  --weather-cloud-overcast: #8fa5a8;
+  --weather-cloud-rain: #5a7a7d;
+  --weather-cloud-storm: #3d5467;
+}

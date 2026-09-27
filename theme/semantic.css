@@ -1,0 +1,254 @@
+/* Semantic — Nexus
+ * Camada de intenção. Aponta sempre para primitives, nunca para hex cru.
+ * Esta é a camada que componentes devem consumir.
+ *
+ * Requer: primitives.css
+ *
+ * ---------------------------------------------------------------------
+ * COMO A COR ESTÁ ORGANIZADA (reestruturado em 08/08/2026)
+ *
+ * Três grupos, e o grupo é escolhido pelo QUE A COR PINTA:
+ *
+ *   surface/  → tudo que preenche
+ *   text/     → tudo que escreve
+ *   border/   → tudo que contorna
+ *
+ * A intenção (brand, critical, success, warning) é MODIFICADOR dentro
+ * do grupo, não um grupo próprio.
+ *
+ * Não existe grupo `action/`. Ele existia e era um grupo de COMPONENTE,
+ * não de papel — e por isso duplicava onze tokens que já existiam aqui:
+ * o fundo do botão secundário já era --surface-default, o hover do
+ * terciário já era --surface-subtle, o texto do primário já era
+ * --text-inverse. Token de componente sempre acaba assim.
+ *
+ * Modificadores:
+ *   -hover / -active   estados de uma superfície SÓLIDA
+ *   -subtle            um degrau mais leve da mesma intenção
+ *   -strong            um degrau mais forte
+ * --------------------------------------------------------------------- */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Color / Surface
+   * --------------------------------------------------------------- */
+  --surface-page: var(--neutral-10);
+  --surface-default: var(--neutral-0);
+  /* subtle e muted são também o hover e o pressionado de QUALQUER
+     controle neutro — botão secundário, botão terciário, item de lista.
+     Não criar token de estado para isso: é a mesma cor. */
+  --surface-subtle: var(--neutral-50);
+  --surface-muted: var(--neutral-100);
+  --surface-inverse: var(--neutral-1000);
+  /* Atenção: --text-disabled por cima disto dá 1,87:1. Usar --text-secondary. */
+  --surface-disabled: var(--neutral-200);
+
+  /* A única superfície sólida de intenção do sistema. */
+  --surface-brand: var(--brand-500);
+  --surface-brand-hover: var(--brand-600);
+  --surface-brand-active: var(--brand-700);
+  --surface-brand-subtle: var(--brand-50);
+
+  /* Fundo de mensagem de erro E hover do botão crítico — é a mesma tinta
+     nos dois, e por isso é um token só.
+     NÃO existe superfície crítica sólida no Nexus: vermelho cheio lê como
+     alarme, e o botão de pedir ajuda precisa convidar. */
+  --surface-critical: var(--red-50);
+  --surface-critical-strong: var(--red-100);
+
+  --surface-success: var(--green-50);
+  --surface-warning: var(--orange-50);
+
+  /* ---------------------------------------------------------------
+   * Color / Text
+   * --------------------------------------------------------------- */
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-tertiary: var(--neutral-500);
+  --text-disabled: var(--neutral-400);
+  /* Também o rótulo do botão primário — texto sobre --surface-brand. */
+  --text-inverse: var(--neutral-0);
+
+  /* Link, botão secundário, botão terciário, tab selecionada, mensagem
+     informativa. Substituiu --text-link, que estava sendo usado como cor
+     de seleção — e link é navegação dentro de texto corrido, não estado. */
+  --text-brand: var(--brand-600);
+
+  /* O ÚNICO vermelho de texto do sistema.
+     700 e não 600 porque precisa sobreviver aos dois usos:
+       · mensagem de erro sobre --surface-critical  → 6,8:1
+       · botão crítico sobre --surface-critical-strong → 5,95:1
+         (com 600 isso cairia para 4,37:1 e reprovaria)
+       · no branco → 8,5:1
+     Antes eram dois vermelhos, e o de mensagem era o insuficiente. */
+  --text-critical: var(--red-700);
+
+  /* Sucesso virou controle (ganhou --border-success), então o texto subiu
+     para 700 pela mesma regra do critical:
+       · sobre --surface-success → 6,9:1  (com 600 seria 5,0:1)
+       · no branco               → 7,6:1
+     Serve mensagem e rótulo de controle — um verde de texto só. */
+  --text-success: var(--green-700);
+
+  /* Alerta continua em 600 porque ainda não tem controle.
+     Regra: se um intent virar ação, o texto dele sobe para 700. */
+  --text-warning: var(--orange-600);
+
+  /* ---------------------------------------------------------------
+   * Color / Border
+   * --------------------------------------------------------------- */
+  --border-subtle: var(--neutral-100);
+  /* Card e input. NÃO serve como contorno de controle: sobre branco dá
+     1,5:1 e WCAG 1.4.11 pede 3:1. */
+  --border-default: var(--neutral-200);
+  --border-strong: var(--neutral-300);
+
+  /* Contorno de CONTROLE. É o peso que passa em 1.4.11:
+     brand/500 dá 5:1, red/500 dá 4,4:1, green/500 dá 3,9:1 no branco
+     (e 3,6:1 sobre --surface-success). */
+  --border-brand: var(--brand-500);
+  --border-critical: var(--red-500);
+  --border-success: var(--green-500);
+
+  /* Contorno de MENSAGEM. Peso de caixa, não de controle — usar um
+     destes num botão dá ~1,7:1 e o contorno some. */
+  --border-brand-subtle: var(--brand-200);
+  --border-critical-subtle: var(--red-200);
+  --border-success-subtle: var(--green-200);
+  --border-warning-subtle: var(--orange-200);
+
+  /* Anel de foco de teclado. Nunca usar sozinho: sobre --surface-brand ele
+     dá 1,43:1 e some. O anel é sempre duas camadas, com um respiro de
+     superfície no meio — é o respiro que faz ele funcionar em qualquer fundo:
+
+       box-shadow: 0 0 0 2px var(--surface-default),
+                   0 0 0 5px var(--border-focus-ring);
+
+     Assim o anel só precisa contrastar com o respiro (7,2:1) e com a página
+     (7:1), não com o botão. Ocupa 5px além da borda: em lista, gap menor que
+     10px encosta no vizinho. */
+  --border-focus-ring: var(--brand-700);
+
+  /* ---------------------------------------------------------------
+   * Number / Radius
+   * --------------------------------------------------------------- */
+  --radius-none: var(--radius-0);
+  --radius-sm: var(--radius-4);
+  --radius-md: var(--radius-8);
+  --radius-lg: var(--radius-16);
+  --radius-pill: var(--radius-full);
+
+  /* ---------------------------------------------------------------
+   * Number / Space — os três grupos
+   *
+   * REGRA (fechada em 07/08/2026, depois da 1ª tela usar os três
+   * trocados entre si). O grupo é escolhido pelo QUE a medida faz,
+   * nunca pelo valor:
+   *
+   *   inset   → padding. Distância entre a borda de um bloco e o que
+   *             está dentro dele.
+   *   stack   → gap de empilhamento VERTICAL.
+   *   inline  → gap de enfileiramento HORIZONTAL.
+   *
+   * Os três repetem os mesmos números de propósito. Trocar `inset/md`
+   * por `stack/md` não muda um pixel hoje — muda o dia em que a escala
+   * de padding precisar andar sem levar a de gap junto. É por isso que
+   * o grupo errado não é detalhe: ele some da vista até doer.
+   *
+   * RAMPA EMPURRADA (16/08/2026). `inset` e `stack` iam 8 -> 16 direto, e
+   * o degrau era largo demais: com a tipografia menor, todo bloco que
+   * pedia 12 pegava 16 e a tela inteira ficou frouxa. O 12 entrou como
+   * `md` e a rampa desceu um degrau — 16 virou `lg`, 24 virou `xl`, e o
+   * 32 voltou como `2xl`. Os três grupos agora batem: 4 / 8 / 12 / 16.
+   * Até 07/08/2026 o 12 era exclusivo de `inline`, com a justificativa de
+   * que 12 seria medida de linha; a justificativa não sobreviveu ao uso.
+   *
+   * O que NÃO é espaçamento e não deve virar token daqui:
+   *   - alinhamento geométrico (centralizar um ponto sob um knob);
+   *   - safe area do aparelho (o 44 do topo é o notch, e em código é
+   *     env(safe-area-inset-top), não um número nosso).
+   * --------------------------------------------------------------- */
+
+  /* inset — padding interno */
+  --space-inset-xs: var(--spacing-4);
+  --space-inset-sm: var(--spacing-8);
+  --space-inset-md: var(--spacing-12);
+  --space-inset-lg: var(--spacing-16);
+  --space-inset-xl: var(--spacing-24);
+  --space-inset-2xl: var(--spacing-32);
+
+  /* inline — gap horizontal */
+  --space-inline-xs: var(--spacing-4);
+  --space-inline-sm: var(--spacing-8);
+  --space-inline-md: var(--spacing-12);
+  --space-inline-lg: var(--spacing-16);
+
+  /* stack — gap vertical */
+  --space-stack-xs: var(--spacing-4);
+  --space-stack-sm: var(--spacing-8);
+  --space-stack-md: var(--spacing-12);
+  --space-stack-lg: var(--spacing-16);
+  --space-stack-xl: var(--spacing-24);
+  --space-stack-2xl: var(--spacing-32);
+
+  /* ---------------------------------------------------------------
+   * Number / Space — layout
+   * --------------------------------------------------------------- */
+  --space-section: var(--spacing-64);
+
+  /* Respiro entre o conteúdo e a borda da tela.
+     Aplicar UMA vez, no container de conteúdo — nunca repetir bloco a
+     bloco, que é o que fazia a tela ter 16 no cabeçalho e 32 no botão.
+     Quem está dentro é width:100% e herda.
+
+     Barra de navegação e qualquer coisa de borda a borda (imagem
+     sangrada, divisor de largura total) ficam FORA desse container.
+
+     16 em toda a app: em 360 de tela dá 328 de conteúdo. Com 32 o botão
+     principal ficaria mais estreito que o texto acima dele e leria como
+     menos importante — o contrário da intenção. */
+  --space-screen-margin: var(--spacing-16);
+
+  /* ---------------------------------------------------------------
+   * Number / Icon
+   *
+   * 16 e não 15: 15 não existe na grade 4pt, e 16 é exatamente a altura
+   * da caixa de linha de .app-label-sm (--line-height-caption) — o ícone
+   * alinha com o rótulo sem ajuste óptico. Lucide é desenhado em grade
+   * de 24, então 16 é a redução limpa dele.
+   *
+   * lg (24) entra quando alguma tela pedir.
+   * --------------------------------------------------------------- */
+  --icon-size-sm: var(--spacing-16);
+
+  /* Ícone de navegação — tab bar, cabeçalho de lista. 20 e não 24: com
+     rótulo de 16 embaixo e gap de 4, o item fecha em 40 de conteúdo +
+     --space-inset-xs nos dois lados = 48, o alvo de toque. */
+  --icon-size-md: var(--spacing-20);
+
+  /* ---------------------------------------------------------------
+   * Elevation
+   *
+   * ATENÇÃO: no Figma isto NÃO é variable — variable não guarda efeito.
+   * É o effect style `elevation/sm`. É o único token daqui que não sai
+   * da collection Semantic, então não some se alguém reexportar as vars.
+   *
+   * Duas sombras: a curta cola o objeto na superfície, a longa e difusa
+   * dá a altura. Preto puro só aqui — sombra não é cor de paleta, é
+   * ausência de luz. Não usar em card: card no Nexus se separa por
+   * borda, não por sombra.
+   * --------------------------------------------------------------- */
+  --elevation-sm: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12);
+}
+
+/* -----------------------------------------------------------------
+ * Dark
+ * Ainda não definido no Figma. Quando o modo Dark existir, o override
+ * entra aqui — só as cores, os tokens de number não mudam por tema.
+ * ----------------------------------------------------------------- */
+/*
+[data-theme="dark"] {
+  --text-primary: var(--neutral-50);
+  ...
+}
+*/

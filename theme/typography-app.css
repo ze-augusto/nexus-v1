@@ -1,0 +1,199 @@
+/* Typography · App — Nexus
+ * Espelha 1:1 a collection "Typography · App" do Figma
+ * (page DS - Foundations, board "App Typography Board" 97:2).
+ *
+ * Superfície: app do aluno e dos pais. Celular nativo + webapp. Nunito.
+ * O dashboard do psicólogo NÃO usa nada daqui — ver typography-dashboard.css.
+ *
+ * Escala única: o app é só celular, não tem eixo de dispositivo.
+ * Por isso não existe media query neste arquivo.
+ *
+ * REGRA DE NOME: caminho do Figma com "/" virando "-", com a superfície
+ * na frente porque `size/body-md` também existe na collection do dashboard.
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * font-family / font-weight
+   *
+   * São variables no Figma (`font-family/base`, `font-weight/*`,
+   * bound em fontFamily/fontStyle nos 13 estilos). O valor no Figma é
+   * o nome do estilo — na Nunito é "SemiBold"/"ExtraBold" SEM espaço,
+   * diferente da Inter ("Semi Bold"). Por isso os pesos são variables
+   * separadas por collection, e não um token compartilhado.
+   * --------------------------------------------------------------- */
+  --app-font-family-base: "Nunito", sans-serif;
+
+  --app-font-weight-regular: 400;   /* Figma: Regular */
+  --app-font-weight-semibold: 600;  /* Figma: SemiBold */
+  --app-font-weight-bold: 700;      /* Figma: Bold */
+  --app-font-weight-extrabold: 800; /* Figma: ExtraBold */
+
+  /* ---------------------------------------------------------------
+   * size
+   * --------------------------------------------------------------- */
+  --app-size-display-1: 40px;
+  --app-size-display-2: 32px;
+  --app-size-heading-1: 24px;
+  --app-size-heading-2: 20px;
+  /* Mesmo valor de `body-md`, e mesmo assim token próprio: heading-3 abre
+     bloco e body-md corre no texto. Papéis diferentes não dividem token,
+     senão mexer no tamanho do corpo arrasta o título junto. Fora da ordem
+     decrescente da rampa de propósito — aqui a ordem é a dos nomes. */
+  --app-size-heading-3: 16px;
+  --app-size-body-lg: 18px;
+  --app-size-body-md: 16px;
+  --app-size-body-sm: 14px;
+  --app-size-caption: 12px;
+
+  /* ---------------------------------------------------------------
+   * line-height
+   * --------------------------------------------------------------- */
+  --app-line-height-display-1: 48px;
+  --app-line-height-display-2: 40px;
+  --app-line-height-heading-1: 32px;
+  --app-line-height-heading-2: 28px;
+  --app-line-height-heading-3: 24px;
+  --app-line-height-body-lg: 28px;
+  --app-line-height-body-md: 24px;
+  --app-line-height-body-sm: 20px;
+  --app-line-height-caption: 16px;
+}
+
+/* -----------------------------------------------------------------
+ * Estilos compostos
+ *
+ * `app/display/1` -> `.app-display-1`, `app/label/lg` -> `.app-label-lg`.
+ *
+ * Três pontos que não são arbitrários:
+ *  - `.app-label-lg` é ExtraBold. É o peso do botão que dá o tom lúdico.
+ *    Não usar em texto corrido.
+ *  - `.app-caption-md` é SemiBold, não Regular. Em UI lúdica o texto
+ *    pequeno precisa continuar firme.
+ *  - `.app-label-sm` carrega `text-transform: uppercase`. Não é decoração:
+ *    o estilo no Figma tem `textCase: UPPER`, então a regra é do token,
+ *    não da tela. Não escrever o texto já em caixa alta no markup —
+ *    quebra leitor de tela e impede voltar atrás em um lugar só.
+ *
+ * Piso de leitura do app: 14px. Nunito é mais macia que Inter em tamanho
+ * pequeno — `--app-size-caption` (12px) só em texto curto e não essencial.
+ * ----------------------------------------------------------------- */
+
+.app-display-1,
+.app-display-2,
+.app-heading-1,
+.app-heading-2,
+.app-heading-3,
+.app-body-lg,
+.app-body-md,
+.app-body-md-bold,
+.app-body-sm,
+.app-label-lg,
+.app-label-md,
+.app-label-sm,
+.app-caption-md {
+  font-family: var(--app-font-family-base);
+}
+
+.app-display-1 {
+  font-weight: var(--app-font-weight-extrabold);
+  font-size: var(--app-size-display-1);
+  line-height: var(--app-line-height-display-1);
+  letter-spacing: -0.015em;
+}
+
+.app-display-2 {
+  font-weight: var(--app-font-weight-extrabold);
+  font-size: var(--app-size-display-2);
+  line-height: var(--app-line-height-display-2);
+  letter-spacing: -0.01em;
+}
+
+.app-heading-1 {
+  font-weight: var(--app-font-weight-bold);
+  font-size: var(--app-size-heading-1);
+  line-height: var(--app-line-height-heading-1);
+  letter-spacing: -0.005em;
+}
+
+.app-heading-2 {
+  font-weight: var(--app-font-weight-bold);
+  font-size: var(--app-size-heading-2);
+  line-height: var(--app-line-height-heading-2);
+  letter-spacing: -0.0025em;
+}
+
+/* 16/24, o mesmo par de .app-body-md-bold — mas por tokens próprios, não
+   pelos do corpo. O que separa os dois é o papel: heading abre bloco,
+   body-md-bold enfatiza dentro do texto corrido. Coincidir hoje não é
+   motivo para andarem amarrados amanhã.
+   Este estilo nasceu depois da rampa, duplicado de `app/body/md-bold`, e
+   por isso herdou os tokens do corpo — era o único da collection sem par
+   próprio. Corrigido no Figma em 09/08/2026: `size/heading-3` e
+   `line-height/heading-3` existem e o estilo está amarrado neles.
+   Tracking 0: a rampa de título só fecha negativo acima de 20px. */
+.app-heading-3 {
+  font-weight: var(--app-font-weight-bold);
+  font-size: var(--app-size-heading-3);
+  line-height: var(--app-line-height-heading-3);
+  letter-spacing: 0;
+}
+
+.app-body-lg {
+  font-weight: var(--app-font-weight-regular);
+  font-size: var(--app-size-body-lg);
+  line-height: var(--app-line-height-body-lg);
+  letter-spacing: 0;
+}
+
+.app-body-md {
+  font-weight: var(--app-font-weight-regular);
+  font-size: var(--app-size-body-md);
+  line-height: var(--app-line-height-body-md);
+  letter-spacing: 0;
+}
+
+.app-body-md-bold {
+  font-weight: var(--app-font-weight-bold);
+  font-size: var(--app-size-body-md);
+  line-height: var(--app-line-height-body-md);
+  letter-spacing: 0;
+}
+
+.app-body-sm {
+  font-weight: var(--app-font-weight-regular);
+  font-size: var(--app-size-body-sm);
+  line-height: var(--app-line-height-body-sm);
+  letter-spacing: 0;
+}
+
+.app-label-lg {
+  font-weight: var(--app-font-weight-extrabold);
+  font-size: var(--app-size-body-md);
+  line-height: var(--app-line-height-body-md);
+  letter-spacing: 0.005em;
+}
+
+.app-label-md {
+  font-weight: var(--app-font-weight-bold);
+  font-size: var(--app-size-body-sm);
+  line-height: var(--app-line-height-body-sm);
+  letter-spacing: 0.005em;
+}
+
+/* Único estilo do sistema com caixa alta obrigatória.
+   Figma: app/label/sm, textCase UPPER. */
+.app-label-sm {
+  font-weight: var(--app-font-weight-bold);
+  font-size: var(--app-size-caption);
+  line-height: var(--app-line-height-caption);
+  letter-spacing: 0.06em; /* Figma: +6% */
+  text-transform: uppercase;
+}
+
+.app-caption-md {
+  font-weight: var(--app-font-weight-semibold);
+  font-size: var(--app-size-caption);
+  line-height: var(--app-line-height-caption);
+  letter-spacing: 0.005em;
+}
