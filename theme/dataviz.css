@@ -1,0 +1,84 @@
+/* Dataviz — Nexus
+ * NÃO espelha collection nenhuma do Figma. As telas do dashboard pintam
+ * heatmap e barras com Primitives direto (brand/*, orange/*, red/*), sem token
+ * semântico por cima — e como elas ainda não estão fechadas, criar o
+ * grupo semântico agora seria congelar uma decisão que não existe.
+ *
+ * Por isso este arquivo é a EXCEÇÃO à regra 3 do README, do mesmo jeito
+ * que illustration.css: um lugar só onde Primitive vira nome de papel,
+ * para que dashboard.css nunca escreva `--brand-400`. Quando o Figma
+ * ganhar o grupo de verdade, os nomes daqui são trocados pelos dele e
+ * este arquivo some ou vira espelho.
+ *
+ * Os nomes são PROVISÓRIOS — são a única coisa inventada no diretório.
+ * Os valores vêm do Figma (Visão geral, 366:8164), MENOS a rampa de
+ * nível: ela foi clareada no código em 27/09/2026 e o Figma ainda tem a
+ * antiga (1000 · 700 · 400 · 200 · 50).
+ *
+ * Superfície: só o dashboard. O app não carrega este arquivo.
+ *
+ * Requer: primitives.css
+ */
+
+:root {
+  /* ---------------------------------------------------------------
+   * Nível emocional — heatmap de série e de aluno
+   *
+   * EM TESTE (28/09/2026) — SÓ O QUE PEDE ATENÇÃO TEM COR. Os níveis
+   * 1 e 2 são pintados; 3, 4 e 5 dividem o mesmo neutro e se leem pelo
+   * número. O olho vai direto às células baixas em vez de varrer uma
+   * rampa inteira. Custo: a tela deixa de mostrar a gradação de 3 a 5.
+   *
+   * Média com casa decimal (29/09/2026): o degrau sai do valor escrito,
+   * não do arredondado — abaixo de 2 é o 1 (escuro), de 2 a 2,9 é o 2
+   * (claro), de 3 para cima é neutro. Ver levelClass em dashboard.js.
+   *
+   * Para voltar à rampa completa (1 escuro → 5 claro), usar brand-700 ·
+   * brand-500 · brand-300 · brand-200 · brand-50, e em dashboard.css o
+   * texto de 1–2 volta a --text-inverse e o de 3–5 a --text-primary.
+   *
+   * Vermelho, não teal (29/09/2026): com só dois degraus pintados, a
+   * cor deixou de ser escala e virou alerta — e alerta de nível
+   * emocional é da família do --text-critical.
+   *
+   * O 2 é o meio-termo de verdade entre o 1 e o neutro: em luminosidade
+   * percebida (L*), red-600 ≈ 41, neutral-50 ≈ 96 e red-300 ≈ 69.
+   *
+   * Texto: no 1 é --text-inverse (6,2:1); no 2 é --text-primary (7,0:1
+   * — branco no red-300 fica em 2,3:1); de 3 a 5 é --text-secondary. A cor nunca diz o nível sozinha — o
+   * número está sempre escrito na célula.
+   *
+   * Célula sem dados não é degrau da rampa: é só o contorno tracejado
+   * (--border-default), sem fundo — o neutro de 3–5 ocupou o fundo que
+   * ela usava.
+   *
+   * 3–5 apontam para o mesmo primitive que --surface-subtle. É repetido
+   * aqui, e não referenciado, para este arquivo depender só de
+   * primitives.css.
+   * --------------------------------------------------------------- */
+  --dataviz-level-1: var(--red-600);
+  --dataviz-level-2: var(--red-300);
+  --dataviz-level-3: var(--neutral-50);
+  --dataviz-level-4: var(--neutral-50);
+  --dataviz-level-5: var(--neutral-50);
+
+  /* A média da linha não tem token aqui: de 2 para baixo ela é
+     --text-critical em negrito, direto da Semantic (ver .grid__average
+     em dashboard.css). */
+
+  /* ---------------------------------------------------------------
+   * Adesão ao check-in — barra por dia
+   * Abaixo do limiar a barra troca de cor; o rótulo do dia troca junto
+   * (--text-warning), porque cor sozinha não é informação.
+   * --------------------------------------------------------------- */
+  --dataviz-bar: var(--brand-300);
+  --dataviz-bar-below-threshold: var(--orange-300);
+
+  /* ---------------------------------------------------------------
+   * Espera por conversa — faixa por tempo de espera
+   * Só a última faixa (5 dias ou mais) é alerta, e ela é mais forte
+   * que o alerta da adesão de propósito: é gente esperando, não taxa.
+   * --------------------------------------------------------------- */
+  --dataviz-queue: var(--brand-200);
+  --dataviz-queue-overdue: var(--orange-500);
+}

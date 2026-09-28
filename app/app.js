@@ -104,7 +104,7 @@
      existe: são as três gotas do SVG abaixo. */
   var DECOR = {
     clear: '<span class="weather__halo" aria-hidden="true"></span>',
-    cloudy: '<img class="weather__ghost" src="assets/weather/cloudy.svg" alt="" aria-hidden="true" />',
+    cloudy: '<img class="weather__ghost" src="../assets/weather/cloudy.svg" alt="" aria-hidden="true" />',
     storm: '<span class="weather__flash" aria-hidden="true"></span>'
   };
 
@@ -113,14 +113,14 @@
      no documento — é a ordem que a coloca por cima, sem z-index. */
   var DECOR_FRONT = {
     cloudy:
-      '<img class="weather__ghost weather__ghost--front" src="assets/weather/cloudy.svg" alt="" aria-hidden="true" />'
+      '<img class="weather__ghost weather__ghost--front" src="../assets/weather/cloudy.svg" alt="" aria-hidden="true" />'
   };
 
   function art(src, extra) {
     return (
       '<img class="weather__art' +
       (extra ? " " + extra : "") +
-      '" src="assets/weather/' +
+      '" src="../assets/weather/' +
       src +
       '.svg" alt="" />'
     );

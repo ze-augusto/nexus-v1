@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nexus · Dashboard do psicólogo — protótipo</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Camadas do sistema, na ordem do contrato: primitives -> semantic ->
+         tipografia da superfície. O dashboard é Inter; typography-app.css
+         e illustration.css NÃO entram aqui, são do outro produto.
+         dataviz.css é a exceção declarada — ver o cabeçalho dele. -->
+    <link rel="stylesheet" href="../theme/primitives.css" />
+    <link rel="stylesheet" href="../theme/semantic.css" />
+    <link rel="stylesheet" href="../theme/typography-dashboard.css" />
+    <link rel="stylesheet" href="../theme/dataviz.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+
+  <body>
+    <!-- Visão geral — 366:8164. A moldura do Figma (browser e barra do
+         Windows) é apresentação, não produto: fica de fora. -->
+    <div class="shell">
+      <!-- ============================================================
+           Barra do topo — só abaixo de 1024px, quando a sidebar vira
+           gaveta. Acima disso fica escondida (display: none), então a
+           marca repetida não aparece duas vezes para leitor de tela.
+           ============================================================ -->
+      <header class="topbar">
+        <div class="topbar__brand dashboard-heading-5">
+          <span class="sidebar__product">Nexus</span>
+          <span>Colégio Carcará</span>
+        </div>
+        <button class="topbar__menu" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">
+          <span class="icon icon--menu" aria-hidden="true"></span>
+        </button>
+      </header>
+
+      <div class="scrim" hidden></div>
+
+      <!-- ============================================================
+           Sidebar
+           ============================================================ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__brand dashboard-heading-4">
+          <span class="sidebar__product">Nexus</span>
+          <span class="sidebar__school">Colégio Carcará</span>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Principal">
+          <ul class="nav">
+            <li><a class="nav__item dashboard-heading-5" href="#" aria-current="page">Visão geral</a></li>
+            <li><a class="nav__item dashboard-heading-5" href="#">Pedidos de conversa</a></li>
+            <li><a class="nav__item dashboard-heading-5" href="#">Turmas</a></li>
+            <li><a class="nav__item dashboard-heading-5" href="#">Alunos</a></li>
+            <li><a class="nav__item dashboard-heading-5" href="#">Atendimentos</a></li>
+            <li><a class="nav__item dashboard-heading-5" href="#">Relatórios</a></li>
+          </ul>
+        </nav>
+
+        <div class="sidebar__user">
+          <div class="avatar" aria-hidden="true">
+            <img src="../assets/img/avatar-pedro.jpg" alt="" />
+          </div>
+          <div class="sidebar__who">
+            <span class="dashboard-body-md-semibold">Pedro Maia Lima</span>
+            <span class="dashboard-caption-md-semibold">Psicólogo</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <header class="page-header">
+          <h1 class="dashboard-heading-2">Visão geral</h1>
+          <p class="page-header__subtitle dashboard-body-md">Resumo dos check-ins diários dos alunos da escola.</p>
+        </header>
+
+        <!-- ============================================================
+             Hoje
+             ============================================================ -->
+        <section class="card" aria-labelledby="today-title">
+          <header class="card__header">
+            <div class="card__title">
+              <h2 class="dashboard-heading-4" id="today-title">Hoje</h2>
+              <p class="card__subtitle dashboard-body-md">Check-ins e pedidos de ajuda registrados até agora.</p>
+            </div>
+            <a class="link dashboard-caption-md-semibold" href="#">
+              Ver pedidos de ajuda
+              <span class="icon icon--arrow-right" aria-hidden="true"></span>
+            </a>
+          </header>
+
+          <!-- As quatro colunas têm o mesmo desenho: número à esquerda, duas
+               linhas de contexto à direita. Só o número cresce, e cresce
+               igual nas quatro, para nenhuma puxar o olho sozinha.
+               3,2 é a média da escola em 18/08 (a mesma do hover do
+               heatmap); 78 dos 190 check-ins marcaram o nível 3 —
+               inventado, data.js não guarda check-in por nível. Uma
+               distribuição que fecha: 14·30·78·44·24 nos níveis 1 a 5
+               soma 190 e dá média 3,2.
+               Pares: nível + turma e adesão + pedidos. Os dois pares
+               ficam lado a lado enquanto as quatro colunas cabem no
+               mínimo delas; quando não cabem, o segundo par desce e o
+               card vira 2 × 2.
+               Turma: a menor média de 18/08 em data.js, com os
+               check-ins dela no dia.
+               Pedidos: os 7 são a fila de "Espera por conversa" (3+2+1+1),
+               e os 3 novos são a faixa "Hoje" dela. -->
+          <div class="today">
+            <div class="today__pair">
+              <div class="today__item">
+                <span class="today__label dashboard-caption-md-semibold">Nível emocional médio</span>
+                <div class="today__row">
+                  <span class="today__number dashboard-heading-3">3,2</span>
+                  <div class="today__stack">
+                    <span class="today__value dashboard-body-md-semibold">Nível 3 - Moderado</span>
+                    <span class="today__meta dashboard-caption-md">78/190 neste nível emocional</span>
+                  </div>
+                </div>
+              </div>
+
+              <span class="today__rule" aria-hidden="true"></span>
+
+              <div class="today__item">
+                <span class="today__label dashboard-caption-md-semibold">Turma com menor média</span>
+                <div class="today__row">
+                  <span class="today__number today__number--critical dashboard-heading-3">1,0</span>
+                  <div class="today__stack">
+                    <span class="today__value dashboard-body-md-semibold">9º ano A</span>
+                    <span class="today__meta dashboard-caption-md">13/15 check-ins</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="today__pair">
+              <div class="today__item">
+                <span class="today__label dashboard-caption-md-semibold">Adesão</span>
+                <div class="today__row">
+                  <span class="today__number dashboard-heading-3">82%</span>
+                  <div class="today__stack today__stack--progress">
+                    <span class="progress" role="progressbar" aria-label="Adesão" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100">
+                      <span class="progress__fill" style="width: 82%"></span>
+                    </span>
+                    <span class="today__meta dashboard-caption-md">190/232 alunos</span>
+                  </div>
+                </div>
+              </div>
+
+              <span class="today__rule" aria-hidden="true"></span>
+
+              <div class="today__item">
+                <span class="today__label dashboard-caption-md-semibold">Pedidos de ajuda</span>
+                <div class="today__row">
+                  <span class="today__number today__number--critical dashboard-heading-3">7</span>
+                  <div class="today__stack">
+                    <span class="today__value dashboard-body-md-semibold">aguardando conversa</span>
+                    <span class="today__meta dashboard-caption-md">3 novos hoje</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             Nível emocional — heatmap por ano
+             ============================================================ -->
+        <section class="card" aria-labelledby="series-title" data-card="series">
+          <header class="card__header">
+            <div class="card__title">
+              <h2 class="dashboard-heading-4" id="series-title">Nível emocional</h2>
+              <p class="card__subtitle dashboard-body-md" data-subtitle>Média diária do nível emocional informado nos check-ins de cada ano ou série.</p>
+            </div>
+          </header>
+
+          <div class="controls">
+            <div class="segmented" role="group" aria-label="Agrupar por" data-group-toggle>
+              <button class="segmented__option dashboard-caption-md-semibold" type="button" aria-pressed="true" data-group="year">Ano/série</button>
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-group="class">Turma</button>
+            </div>
+            <div class="segmented" role="group" aria-label="Período" data-period-group>
+              <button class="segmented__option dashboard-caption-md-semibold" type="button" aria-pressed="true" data-period="10d">10 dias</button>
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-period="30d">30 dias</button>
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-period="bim">Bimestre</button>
+              <!-- Abre o seletor de datas. Por enquanto só o lugar do clique. -->
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" aria-haspopup="dialog">
+                <span class="icon icon--calendar" aria-hidden="true"></span>
+                Personalizado
+              </button>
+            </div>
+            <label class="check dashboard-caption-md">
+              <input type="checkbox" checked />
+              Ocultar fins de semana
+            </label>
+          </div>
+
+          <!-- Rótulo pelo título do card e não por <caption>: o WebKit
+               reserva espaço para o caption mesmo escondido, e a grade
+               ganhava 8px entre o cabeçalho e a primeira linha.
+               colgroup, thead e tbody saem do JS: o número de colunas
+               muda com o período. -->
+          <div class="grid-scroll">
+            <table class="grid" id="grid-series" aria-labelledby="series-title">
+              <colgroup></colgroup>
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="legend dashboard-caption-md">
+            <span class="legend__group">
+              Pior
+              <span class="legend__scale" aria-hidden="true">
+                <span class="legend__swatch cell--1">1</span>
+                <span class="legend__swatch cell--2">2</span>
+                <span class="legend__swatch cell--3">3</span>
+                <span class="legend__swatch cell--4">4</span>
+                <span class="legend__swatch cell--5">5</span>
+              </span>
+              Melhor
+            </span>
+            <span class="legend__group">
+              <span class="legend__swatch cell--empty" aria-hidden="true"></span>
+              Sem check-ins
+            </span>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             Alunos para acompanhar
+             ============================================================ -->
+        <section class="card" aria-labelledby="students-title" data-card="students">
+          <header class="card__header">
+            <div class="card__title">
+              <h2 class="dashboard-heading-4" id="students-title">Alunos para acompanhar</h2>
+              <p class="card__subtitle dashboard-body-md">Alunos cujo nível emocional mais caiu no período.</p>
+            </div>
+            <a class="link dashboard-caption-md-semibold" href="#">
+              Ver todos os alunos
+              <span class="icon icon--arrow-right" aria-hidden="true"></span>
+            </a>
+          </header>
+
+          <div class="controls">
+            <div class="segmented" role="group" aria-label="Período" data-period-group>
+              <button class="segmented__option dashboard-caption-md-semibold" type="button" aria-pressed="true" data-period="10d">10 dias</button>
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-period="30d">30 dias</button>
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-period="bim">Bimestre</button>
+              <!-- Abre o seletor de datas. Por enquanto só o lugar do clique. -->
+              <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" aria-haspopup="dialog">
+                <span class="icon icon--calendar" aria-hidden="true"></span>
+                Personalizado
+              </button>
+            </div>
+          </div>
+
+          <div class="grid-scroll">
+            <table class="grid" id="grid-students" aria-labelledby="students-title">
+              <colgroup></colgroup>
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <p class="legend dashboard-caption-md">
+            <span class="legend__group">
+              <span class="marker" aria-hidden="true"></span>
+              Aguardando conversa
+            </span>
+          </p>
+        </section>
+
+        <!-- ============================================================
+             Adesão + espera
+             ============================================================ -->
+        <div class="pair">
+          <section class="card" aria-labelledby="adherence-title" data-card="adherence">
+            <header class="card__header">
+              <div class="card__title">
+                <h2 class="dashboard-heading-4" id="adherence-title">Adesão ao check-in</h2>
+                <p class="card__subtitle dashboard-body-md" data-subtitle>Parcela dos alunos que fez o check-in em cada dia. A linha tracejada marca o mínimo esperado.</p>
+              </div>
+            </header>
+
+            <div class="controls">
+              <div class="segmented" role="group" aria-label="Período" data-period-group>
+                <button class="segmented__option dashboard-caption-md-semibold" type="button" aria-pressed="true" data-period="10d">10 dias</button>
+                <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-period="30d">30 dias</button>
+                <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" data-period="bim">Bimestre</button>
+                <!-- Abre o seletor de datas. Por enquanto só o lugar do clique. -->
+                <button class="segmented__option dashboard-caption-md" type="button" aria-pressed="false" aria-haspopup="dialog">
+                  <span class="icon icon--calendar" aria-hidden="true"></span>
+                  Personalizado
+                </button>
+              </div>
+            </div>
+
+            <div class="bars">
+              <div class="bars__plot" id="adherence-plot">
+                <span class="bars__threshold" aria-hidden="true"></span>
+                <span class="bars__base" aria-hidden="true"></span>
+                <span class="bars__threshold-label dashboard-caption-md" aria-hidden="true">70%</span>
+              </div>
+              <div class="bars__days dashboard-caption-md" id="adherence-days"></div>
+            </div>
+
+          </section>
+
+          <section class="card" aria-labelledby="queue-title">
+            <header class="card__header">
+              <div class="card__title">
+                <h2 class="dashboard-heading-4" id="queue-title">Espera por conversa</h2>
+                <p class="card__subtitle dashboard-body-md">Alunos que pediram uma conversa e ainda aguardam, por tempo de espera.</p>
+              </div>
+              <a class="link dashboard-caption-md-semibold" href="#">
+                Ver a fila
+                <span class="icon icon--arrow-right" aria-hidden="true"></span>
+              </a>
+            </header>
+
+            <ul class="queue" id="queue"></ul>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
