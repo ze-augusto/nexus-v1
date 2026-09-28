@@ -1,0 +1,1062 @@
+/* Protótipo — Dashboard do psicólogo (Nexus)
+ *
+ * Consome APENAS a camada Semantic + Typography · Dashboard + Dataviz.
+ * Nenhum hex e nenhum px solto no lugar de var() — ver theme/README.md,
+ * regra 4. Nenhum primitive direto: cor de gráfico vem de --dataviz-*.
+ *
+ * As medidas cruas que sobram são geometria do Figma, não espaçamento,
+ * e nenhuma tem token (Visão geral, 366:8164):
+ *   · 230 da sidebar
+ *   · 150 da coluna de rótulo e 74 da coluna de média/variação
+ *   · 56×28 da caixa de nível do heatmap (máximo; encolhe na largura
+ *     até 20 quando a grade rola),
+ *     e 20 da amostra da legenda
+ *   · 40 do avatar e 6 do marcador de pedido
+ *   · 88 da plotagem de adesão, 8 e 200 da barra de progresso, 18 da faixa
+ *     de espera, 110 e 28 do rótulo e da quantidade da espera
+ *   · 4/3 do tracejado do limiar
+ *   · 1200 e 1024 dos breakpoints (var() não entra em @media)
+ *   · 32% do véu atrás da gaveta — não há token de scrim na Semantic
+ *
+ * Nada aqui é compartilhado com app/app.css. O reset abaixo repete o do
+ * app de propósito: são produtos separados, e quinze linhas duplicadas
+ * custam menos que uma camada compartilhada que os dois teriam que
+ * respeitar.
+ * ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--dashboard-font-family-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* -------------------------------------------------------------------
+ * Estrutura
+ *
+ * Sidebar fixa na altura da janela, conteúdo rolando ao lado. Os 16
+ * entre a borda da sidebar e os cards são o padding esquerdo do
+ * conteúdo; em cima, à direita e embaixo são 24.
+ * ------------------------------------------------------------------- */
+.shell {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  min-height: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-lg);
+  min-width: 0;
+  padding: var(--space-inset-xl) var(--space-inset-xl) var(--space-inset-xl) var(--space-inset-lg);
+}
+
+/* Barra do topo: só existe abaixo de 1024 (ver Responsividade). */
+.topbar {
+  display: none;
+}
+
+/* -------------------------------------------------------------------
+ * Sidebar
+ * ------------------------------------------------------------------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section);
+  padding-top: var(--space-inset-xl);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.sidebar__brand {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--space-inset-xl);
+}
+
+.sidebar__product {
+  color: var(--text-brand);
+}
+
+.sidebar__nav {
+  flex: 1 0 0;
+  min-height: 0;
+  padding: 0 var(--space-inset-md);
+}
+
+.nav__item {
+  display: block;
+  padding: var(--space-inset-md);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+.nav__item[aria-current="page"] {
+  background: var(--surface-brand-subtle);
+  color: var(--text-brand);
+}
+
+.sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-inline-md);
+  padding: var(--space-inset-xl) var(--space-inset-xl) var(--space-inset-lg);
+  border-top: 1px solid var(--border-default);
+}
+
+.sidebar__who {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-secondary);
+}
+
+/* O enquadramento vem do Figma (366:8190): a foto é maior que o
+   círculo e está deslocada, então não dá para usar object-fit. */
+.avatar {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+}
+
+.avatar img {
+  position: absolute;
+  width: 233.54%;
+  height: 350.3%;
+  left: -79.8%;
+  top: -81.67%;
+  max-width: none;
+}
+
+/* -------------------------------------------------------------------
+ * Cabeçalho da página
+ *
+ * O título da tela é o primeiro ponto de leitura: diz onde se está
+ * antes de qualquer número. O subtítulo explica, não resume dado.
+ * ------------------------------------------------------------------- */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-xs);
+  padding-bottom: var(--space-stack-sm);
+}
+
+.page-header__subtitle {
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------
+ * Card
+ *
+ * Uma régua só: a borda do card. Cabeçalho e conteúdo se separam por
+ * espaço, não por linha.
+ * ------------------------------------------------------------------- */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-lg);
+  min-width: 0;
+  padding: var(--space-inset-lg);
+  background: var(--surface-default);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-inline-lg);
+}
+
+.card__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.card__header > .link {
+  flex: none;
+  padding-top: var(--space-inset-xs);
+}
+
+.card__subtitle {
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------------
+ * Controles — só estado visual por enquanto, nada reage.
+ *
+ * Os filtros ficam numa linha própria, abaixo do título: o título não
+ * divide a linha com eles e o card estreito não espreme o subtítulo.
+ *
+ * O selecionado é o botão claro sobre o trilho cinza, não o teal
+ * cheio: filtro é contexto, não chamada para ação.
+ *
+ * TRAÇO INTERNO. No Figma todo stroke daqui é inside: não soma à
+ * medida. Borda de CSS soma. Por isso card, opção selecionada e dia de
+ * hoje contornam com box-shadow inset.
+ * ------------------------------------------------------------------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-inline-md);
+}
+
+.segmented {
+  display: flex;
+  align-items: center;
+  gap: var(--space-inline-xs);
+  padding: var(--space-inset-xs);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.segmented__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-inline-xs);
+  padding: var(--space-inset-xs) var(--space-inline-md);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.segmented__option[aria-pressed="true"] {
+  background: var(--surface-default);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-primary);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-inline-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.check input {
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  margin: 0;
+  accent-color: var(--surface-brand);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-inline-sm);
+  color: var(--text-brand);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------
+ * Icon — mesmo padrão do app: SVG do Figma como máscara, cor do token.
+ * O arrow-right do Figma tem 15; aqui entra no degrau de 16.
+ * ------------------------------------------------------------------- */
+.icon {
+  flex: none;
+  display: block;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
+  background-color: currentColor;
+  -webkit-mask: var(--icon-src) center / contain no-repeat;
+  mask: var(--icon-src) center / contain no-repeat;
+}
+
+.icon--calendar {
+  --icon-src: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.333 1.333V4M10.667 1.333V4M2 6.667H14M3.333 2.667H12.667C13.403 2.667 14 3.264 14 4V13.333C14 14.07 13.403 14.667 12.667 14.667H3.333C2.597 14.667 2 14.07 2 13.333V4C2 3.264 2.597 2.667 3.333 2.667Z' stroke='%23007B88' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); /* calendar.svg */
+}
+
+.icon--menu {
+  --icon-src: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.333 5H16.667M3.333 10H16.667M3.333 15H16.667' stroke='%231E2120' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); /* menu.svg */
+}
+
+.icon--arrow-right {
+  --icon-src: url("data:image/svg+xml,%3Csvg preserveAspectRatio='none' overflow='visible' width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='lucide/arrow-right'%3E%3Cpath id='Vector' d='M3.125 7.5H11.875M7.5 11.875L11.875 7.5L7.5 3.125' stroke='%23007B88' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E"); /* arrow-right.svg */
+}
+
+/* -------------------------------------------------------------------
+ * Hoje
+ *
+ * Quatro colunas de largura igual, com o conteúdo alinhado à esquerda
+ * em todas, em dois pares (nível + turma, adesão + pedidos). Nenhuma
+ * coluna fica mais estreita que o próprio conteúdo (texto não quebra;
+ * a barra de adesão encolhe até a largura do texto de baixo dela).
+ *
+ * Os pares quebram linha sozinhos: enquanto o mínimo das quatro cabe,
+ * ficam lado a lado; quando não cabe, o segundo desce e vira 2 × 2 —
+ * sem breakpoint. O vão entre pares é o mesmo de dentro do par
+ * (16 + régua + 16), então as quatro colunas saem iguais.
+ *
+ * A régua entre os pares é desenhada pelo segundo par, no meio do vão
+ * à esquerda dele. Quando ele desce, ela fica fora da caixa e o
+ * overflow a corta.
+ * ------------------------------------------------------------------- */
+.today {
+  --today-gap: calc(2 * var(--space-inset-lg) + 1px);
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--today-gap);
+  row-gap: var(--space-stack-xl);
+  overflow: hidden;
+}
+
+.today__pair {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  gap: var(--space-inset-lg);
+}
+
+.today__pair + .today__pair::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--space-inset-lg) - 1px);
+  width: 1px;
+  background: var(--border-subtle);
+}
+
+.today__item {
+  flex: 1 1 0;
+  min-width: max-content;
+  display: grid;
+  align-content: start;
+  gap: var(--space-stack-sm);
+}
+
+.today__rule {
+  flex: none;
+  width: 1px;
+  background: var(--border-subtle);
+}
+
+.today__label,
+.today__meta {
+  color: var(--text-secondary);
+}
+
+/* Nada quebra linha: quem cede espaço é a barra de adesão. */
+.today__label,
+.today__meta {
+  white-space: nowrap;
+}
+
+/* Número à esquerda, duas linhas de contexto à direita — igual nas
+   três colunas. */
+.today__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-inline-md);
+}
+
+/* Em teste (28/09): número numa caixa de borda sutil. A caixa tem a
+   altura das duas linhas ao lado (28 da linha + 4 + 4) e nunca fica
+   mais estreita que alta: o "7" também é um quadrado. */
+.today__number {
+  flex: none;
+  min-width: calc(var(--dashboard-line-height-h3) + 2 * var(--space-inset-xs));
+  padding: var(--space-inset-xs) var(--space-inset-sm);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.today__number--critical {
+  color: var(--text-critical);
+}
+
+.today__stack {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.today__value {
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* A barra não tem largura própria de conteúdo: cresce até 200 e
+   encolhe até a largura do texto de baixo. Ocupa a linha de cima,
+   centrada numa caixa da altura da linha de texto das vizinhas, e as
+   colunas ficam da mesma altura. */
+.today__stack--progress {
+  flex: 1 1 0;
+  min-width: max-content;
+  max-width: 200px;
+}
+
+.today__stack--progress .progress {
+  flex: none;
+  margin: calc((var(--dashboard-line-height-body-md) - 8px) / 2) 0;
+}
+
+.progress {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+}
+
+.progress__fill {
+  display: block;
+  height: 100%;
+  background: var(--surface-brand);
+}
+
+/* -------------------------------------------------------------------
+ * Grade — heatmap de série e de aluno
+ *
+ * <table> de verdade, para leitor de tela ler linha e coluna. O
+ * border-spacing faz os gaps do Figma: 4 entre células e 8 entre
+ * linhas. Nos 12 entre rótulo e células (e entre células e média),
+ * os 8 que faltam são padding da coluna da ponta. A margem negativa
+ * (no invólucro, não na tabela, senão a rolagem cortaria a borda) tira
+ * o espaçamento que a tabela põe também nas bordas de fora.
+ *
+ * ROLAGEM. Só quando a média com decimal não cabe: 30 dias em tela
+ * estreita (data-scroll, posto pelo JS). A caixa tem piso de 20 — o
+ * "2,4" tem 17 — e os nomes ficam presos à esquerda.
+ * ------------------------------------------------------------------- */
+.grid-scroll {
+  margin: calc(-1 * var(--space-stack-sm)) calc(-1 * var(--space-inline-xs));
+}
+
+.grid-scroll[data-scroll] {
+  overflow-x: auto;
+}
+
+.grid-scroll[data-scroll] .grid {
+  min-width: calc(150px + 74px + 4 * var(--space-inline-sm) + var(--columns) * (20px + var(--space-inline-xs)));
+}
+
+.grid-scroll[data-scroll] :is(.grid__corner, .grid__label) {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface-default);
+}
+
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: var(--space-inline-xs) var(--space-stack-sm);
+  table-layout: fixed;
+}
+
+.grid__col-label {
+  width: calc(150px + var(--space-inline-sm));
+}
+
+.grid__col-end {
+  width: calc(74px + var(--space-inline-sm));
+}
+
+/* :where() em volta de tudo zera a especificidade do reset. Sem ele,
+   `.grid th` ganha de `.grid__day` e apaga o padding dos dias; e com só
+   o `th, td` dentro do :where(), o `.grid` ainda conta 0,1,0, empata com
+   as classes tipográficas e, por vir depois, apaga o peso delas. */
+:where(.grid th, .grid td) {
+  padding: 0;
+  font-weight: inherit;
+}
+
+.grid__corner,
+.grid__label {
+  padding-right: var(--space-inline-sm);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.grid__corner,
+.grid__end {
+  color: var(--text-secondary);
+}
+
+.grid__end,
+.grid__average,
+.grid__delta {
+  padding-left: var(--space-inline-sm);
+}
+
+.grid__end {
+  text-align: center;
+}
+
+#grid-students .grid__end {
+  text-align: right;
+}
+
+.grid__day {
+  padding: var(--space-inset-xs) 0;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.grid__day > span {
+  display: block;
+}
+
+/* Hoje se marca só pela cor do texto. A caixa em volta do cabeçalho
+   tinha a largura da coluna, e com as células menores ela ficava mais
+   larga que a própria coluna de dados. */
+.grid__day--today {
+  color: var(--text-brand);
+}
+
+.grid__label--series {
+  color: var(--text-secondary);
+}
+
+.grid__label--series > span {
+  display: block;
+}
+
+.grid__student {
+  display: flex;
+  align-items: center;
+  gap: var(--space-inline-xs);
+}
+
+.grid__names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--text-primary);
+}
+
+.grid__group {
+  color: var(--text-tertiary);
+}
+
+.grid__average {
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Abaixo de 3 a média é alerta, vermelha; de 4 para cima é destaque
+   positivo, verde de sucesso (a marca já marca hoje, links e menu). As duas em negrito (a classe tipográfica
+   vem do markup). A régua é mais larga que a das células, que só
+   pintam 1 e 2: aqui um 2,7 já pede atenção. */
+.grid__average--critical {
+  color: var(--text-critical);
+}
+
+.grid__average--positive {
+  color: var(--text-success);
+}
+
+/* Sem cor: a lista inteira já é de queda, então pintar toda variação
+   de vermelho ou laranja não separa ninguém. O sinal e o peso bastam. */
+.grid__delta {
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Célula de nível. No 1 o fundo é escuro e o número é inverso; no 2
+   o fundo é médio e o número é primário; de 3 a 5 o fundo é neutro e o
+   número é secundário (ver dataviz.css). */
+.cell {
+  text-align: center;
+}
+
+.cell__box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 56px;
+  height: 28px;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+}
+
+.cell--1 { background: var(--dataviz-level-1); color: var(--text-inverse); }
+.cell--2 { background: var(--dataviz-level-2); color: var(--text-primary); }
+.cell--3 { background: var(--dataviz-level-3); color: var(--text-secondary); }
+.cell--4 { background: var(--dataviz-level-4); color: var(--text-secondary); }
+.cell--5 { background: var(--dataviz-level-5); color: var(--text-secondary); }
+
+.cell--empty {
+  background: none;
+  border: 1px dashed var(--border-default);
+}
+
+/* Mira do hover: a célula ganha contorno, o dia e o nome da linha
+   ganham fundo. O fundo sai 4 para cada lado por box-shadow, sem
+   mexer na medida da coluna. `.grid` na frente para ganhar do fundo
+   da coluna presa quando a grade rola. */
+.cell__box.is-hover {
+  box-shadow: 0 0 0 2px var(--surface-default), 0 0 0 3px var(--border-focus-ring);
+}
+
+.grid .grid__day.is-hover,
+.grid .grid__label.is-hover {
+  background: var(--surface-subtle);
+  box-shadow: 0 0 0 var(--space-inline-xs) var(--surface-subtle);
+  color: var(--text-primary);
+}
+
+.grid .grid__label.is-hover {
+  border-radius: var(--radius-sm);
+}
+
+/* Marcador de "Aguardando conversa". No Figma é um SVG de círculo com
+   o hex do --text-warning cravado; aqui é o mesmo círculo pintado pelo
+   token. O vazio segura o alinhamento dos nomes. */
+.marker {
+  flex: none;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--text-warning);
+}
+
+.marker--empty {
+  background: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-stack-xs) var(--space-inline-lg);
+  color: var(--text-tertiary);
+}
+
+.legend__group,
+.legend__scale {
+  display: inline-flex;
+  align-items: center;
+}
+
+.legend__group {
+  gap: var(--space-inline-sm);
+}
+
+.legend__scale {
+  gap: var(--space-inline-xs);
+}
+
+.legend__swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+}
+
+/* -------------------------------------------------------------------
+ * Adesão + espera — dois cards lado a lado, cada um na própria altura.
+ * ------------------------------------------------------------------- */
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-inline-lg);
+}
+
+/* Barras de adesão. A altura de cada barra é o percentual da área de
+   plotagem — 70% de altura é a linha de 70%. As duas linhas vêm antes
+   das barras no DOM para ficarem por baixo delas. */
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-xs);
+}
+
+.bars__plot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-inline-xs);
+  height: 88px;
+  padding-left: var(--space-inset-2xl);
+}
+
+.bars__threshold,
+.bars__base {
+  position: absolute;
+  left: var(--space-inset-2xl);
+  right: 0;
+  height: 1px;
+}
+
+.bars__threshold {
+  bottom: var(--threshold);
+  background: repeating-linear-gradient(to right, var(--border-default) 0 4px, transparent 4px 7px);
+}
+
+.bars__base {
+  bottom: 0;
+  background: var(--border-subtle);
+}
+
+.bars__threshold-label {
+  position: absolute;
+  left: 0;
+  bottom: var(--threshold);
+  transform: translateY(50%);
+  color: var(--text-tertiary);
+}
+
+.bars__bar {
+  position: relative;
+  flex: 1 0 0;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  background: var(--dataviz-bar);
+}
+
+.bars__bar--below {
+  background: var(--dataviz-bar-below-threshold);
+}
+
+.bars__bar:hover,
+.bars__bar:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--border-focus-ring);
+}
+
+/* Balão — barra de adesão e célula do heatmap. Superfície
+   clara com elevação, não o inverso escuro: aparece em cima do gráfico
+   e não pode virar o elemento mais pesado. */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + var(--space-stack-sm));
+  left: 50%;
+  z-index: 1;
+  display: none;
+  flex-direction: column;
+  gap: var(--space-stack-xs);
+  padding: var(--space-inset-sm) var(--space-inset-md);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  box-shadow: var(--elevation-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.tooltip--start {
+  left: 0;
+  transform: none;
+}
+
+.tooltip--end {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.bars__bar:hover .tooltip,
+.bars__bar:focus-visible .tooltip {
+  display: flex;
+}
+
+/* O do heatmap é um só, fora da grade, posicionado pelo JS. */
+.tooltip--floating {
+  position: fixed;
+  top: 0;
+  bottom: auto;
+  left: 0;
+  z-index: 5;
+  transform: none;
+}
+
+.tooltip--floating[data-open] {
+  display: flex;
+}
+
+.tooltip__list + .tooltip__label {
+  margin-top: var(--space-stack-xs);
+}
+
+.tooltip__header {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Soma ao gap do balão: separa quem/quando dos números. */
+.tooltip__header + * {
+  margin-top: var(--space-stack-xs);
+}
+
+.tooltip__title {
+  color: var(--text-primary);
+}
+
+.tooltip__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-inline-lg);
+}
+
+.tooltip__value {
+  color: var(--text-primary);
+}
+
+.tooltip__value--warning {
+  color: var(--text-warning);
+}
+
+/* Vermelho e verde vão em negrito, como na coluna Média (classe no
+   markup). */
+.tooltip__value--critical {
+  color: var(--text-critical);
+}
+
+.tooltip__value--positive {
+  color: var(--text-success);
+}
+
+.bars__days {
+  display: flex;
+  gap: var(--space-inline-xs);
+  padding-left: var(--space-inset-2xl);
+}
+
+.bars__day {
+  flex: 1 0 0;
+  min-width: 0;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.bars__day--below {
+  color: var(--text-warning);
+}
+
+/* Espera por conversa */
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm);
+}
+
+.queue__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-inline-md);
+}
+
+.queue__label {
+  flex: none;
+  width: 110px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.queue__track {
+  flex: 1 0 0;
+  min-width: 0;
+  height: 18px;
+}
+
+.queue__bar {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--dataviz-queue);
+}
+
+.queue__row--overdue .queue__bar {
+  background: var(--dataviz-queue-overdue);
+}
+
+.queue__count {
+  flex: none;
+  width: 28px;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.queue__row--overdue .queue__count {
+  color: var(--text-critical);
+}
+
+/* -------------------------------------------------------------------
+ * Responsividade — desktop e tablet, de 768 para cima. Abaixo de 768
+ * está fora do escopo por enquanto.
+ *
+ *   · < 1200: adesão e espera empilham. Lado a lado, cada card ficava
+ *     estreito demais para dez barras e para o subtítulo.
+ *   · < 1024: a sidebar vira gaveta e aparece a barra do topo com o
+ *     botão de menu.
+ *
+ * O heatmap não tem regra própria: a caixa de nível tem tamanho máximo
+ * e encolhe com a coluna, então dez dias cabem até em 768 sem rolagem.
+ * ------------------------------------------------------------------- */
+@media (max-width: 1199px) {
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1023px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .content {
+    padding: var(--space-inset-xl);
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-inline-lg);
+    padding: var(--space-inset-sm) var(--space-inset-xl);
+    background: var(--surface-page);
+    box-shadow: inset 0 -1px 0 var(--border-subtle);
+  }
+
+  .topbar__brand {
+    display: flex;
+    gap: var(--space-inline-sm);
+  }
+
+  /* 20 de ícone + 12 de cada lado = 44, o alvo de toque do tablet. A
+     margem negativa alinha o ícone com a borda do conteúdo. */
+  .topbar__menu {
+    display: flex;
+    margin-right: calc(-1 * var(--space-inset-md));
+    padding: var(--space-inset-md);
+    border: 0;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .topbar__menu .icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+  }
+
+  /* Fechada, a gaveta sai da tela E some do foco (visibility), senão o
+     Tab passaria pelos links escondidos. A visibility só troca depois
+     do deslize, para a saída ser vista. */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    width: 230px;
+    height: 100vh;
+    height: 100dvh;
+    border-right: 0;
+    background: var(--surface-default);
+    box-shadow: var(--elevation-sm);
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform 200ms ease, visibility 0s 200ms;
+  }
+
+  .sidebar.is-open {
+    visibility: visible;
+    transform: none;
+    transition: transform 200ms ease;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    background: color-mix(in srgb, var(--surface-inverse) 32%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+
+  .sidebar.is-open {
+    transition: none;
+  }
+}

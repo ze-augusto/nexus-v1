@@ -17,9 +17,38 @@ Quando os dois discordarem, o Figma está certo e o código está desatualizado.
 | `typography-dashboard.css` | `Typography · Dashboard` | `Default` |
 | `typography-app.css` | `Typography · App` | `Default` |
 | `illustration.css` | `Illustration` | `Default` |
+| `dataviz.css` | — (nenhuma, ainda) | — |
 
-`illustration.css` é o único que **não** faz parte do contrato de interface —
-ver "A exceção" abaixo.
+`illustration.css` e `dataviz.css` **não** fazem parte do contrato de
+interface — ver "As exceções" abaixo.
+
+Quem carrega o quê:
+
+| | `app/` | `dashboard/` |
+|---|---|---|
+| `primitives.css` | ✓ | ✓ |
+| `semantic.css` | ✓ | ✓ |
+| `typography-app.css` | ✓ | |
+| `typography-dashboard.css` | | ✓ |
+| `illustration.css` | ✓ | |
+| `dataviz.css` | | ✓ |
+
+---
+
+## As exceções
+
+**`illustration.css`** é a paleta das ilustrações de clima do check-in e de
+mais nada. Espelha a collection `Illustration`, mas não é cor de UI.
+
+**`dataviz.css`** é a cor do heatmap e dos gráficos do dashboard. No Figma
+essas telas pintam com Primitives direto (`brand/1000`…`brand/50`,
+`orange/300`, `orange/500`), sem token semântico — e como elas ainda não
+estão fechadas, o grupo semântico não foi criado. O arquivo existe para que
+`dashboard.css` nunca escreva `--brand-400`: é o único lugar onde Primitive
+vira nome de papel fora da Semantic. Os nomes (`--dataviz-*`) são
+**provisórios** e são a única coisa inventada neste diretório; os valores
+são os do Figma. Quando o Figma ganhar o grupo, os nomes daqui dão lugar
+aos dele.
 
 
 ---
